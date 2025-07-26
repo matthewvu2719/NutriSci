@@ -58,4 +58,11 @@ public class User {
 	public void setWeight(double weight) {
 		this.weight = weight;
 	}
+
+	@Override
+	public String toString() {
+	    return String.format("%s (%s, %d years old, %.1f cm, %.1f kg)",
+	                         getName(), getSex(), getAge(), getHeight(), getWeight());
+	}
+
 }

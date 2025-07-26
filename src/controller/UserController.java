@@ -1,10 +1,13 @@
 package controller;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import model.User;
 import service.IUserService;
 import service.UserService;
 import view.IUserView;
+import view.MainFrame;
 
 
 public class UserController {
@@ -30,21 +33,31 @@ public class UserController {
     
     private void initEventListeners() {
         userFrame.addCreateUserListener(e -> addUser());
+        
+        userFrame.addLoadUserListener(e -> {
+            User selectedUser = (User) userFrame.getUserDropdown().getSelectedItem();
+            if (selectedUser != null) {	                	
+            	
+            	MainFrame mainFrame = new MainFrame(selectedUser);
+            	MainFrameController mainController = MainFrameController.getInstance();
+            	mainController.setMainFrame(mainFrame);
+            	mainFrame.setVisible(true);
+            	userFrame.exit();
+            	
+            } else {
+                JOptionPane.showMessageDialog(null, "Please select a user.");
+            }
+        });
+        
     }
     
     
     public void loadUsersToDropdown() {
-    	 List<User> users = userService.getAllUsers();
-    	    String[] userList = users.stream()
-    	        .map(user -> String.format("%s (%s, %d years old, %.1f cm, %.1f kg)",
-    	                                   user.getName(),
-    	                                   user.getSex(),
-    	                                   user.getAge(),
-    	                                   user.getHeight(),
-    	                                   user.getWeight()))
-    	        .toArray(String[]::new);
-    	    userFrame.setUserDropdownOptions(userList);
+        List<User> users = userService.getAllUsers();
+        User[] userArray = users.toArray(new User[0]);
+        userFrame.setUserDropdownOptions(userArray);
     }
+
     
     private void addUser() {
         String name = userFrame.getName();
@@ -52,12 +65,6 @@ public class UserController {
         int age = userFrame.getAge();
         double height = userFrame.getUserHeight();
         double weight = userFrame.getUserWeight();
-
-//        if (name.isEmpty()) {
-//            userFrame.showMessage("Name cannot be empty");
-//            return;
-//        }
-
         User user = new User();
         user.setName(name);
         user.setSex(User.Sex.valueOf(sexStr));
@@ -67,7 +74,7 @@ public class UserController {
 
         userService.createUser(user);
         loadUsersToDropdown();
-//        userFrame.showMessage("User created successfully!");
+        JOptionPane.showMessageDialog(null, "User created successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
 //        userFrame.clearInputs();
     }
     
@@ -77,8 +84,8 @@ public class UserController {
 		userService.deleteUserById(id);
 	}
 	
-	public void getUserById(int id) {
-		userService.getUserById(id);
+	public User getUserById(int id) {
+		return userService.getUserById(id);
 	}
 	
 	public void updateUserById(User user, int id) {

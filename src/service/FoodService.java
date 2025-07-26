@@ -23,7 +23,7 @@ public class FoodService implements IFoodService{
 	
 	@Override
 	public int getSwapCandidate(int originalFoodId, String goal) throws SQLException{
-		return foodDao.getSwapCandidate(originalFoodId, goal);
+		return 0;
 	}
 
 	@Override
